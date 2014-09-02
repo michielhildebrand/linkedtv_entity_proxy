@@ -89,4 +89,4 @@ entity_prop(film, director, ['http://dbpedia.org/ontology/director'], true).
 entity_prop(film, musicComposer, ['http://dbpedia.org/ontology/musicComposer'], true).
 entity_prop(film, starring, ['http://dbpedia.org/ontology/starring'], true).
 
-entity_prop(organisation(chairman, ['http://dbpedia.org/ontology/chairman'], true).
+entity_prop(organisation, chairman, ['http://dbpedia.org/ontology/chairman'], true).
