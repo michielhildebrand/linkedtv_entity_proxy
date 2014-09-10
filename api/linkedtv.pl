@@ -197,7 +197,7 @@ http_episode(Request) :-
 	fetch_chapters(MR, AttributedTo, Chapters),
 	fetch_entities(MR, AttributedTo, Entities),
 	chapter_entities(Chapters, Entities, ChapterData),
-	maplist(chapter_json, ChapterData, ChapterJSON),
+	chapter_list(1, ChapterData, ChapterJSON),
 	reply_json(json([title= Title,
 			 date=Date,
 			 source=Publisher,
@@ -275,20 +275,31 @@ fetch_entities(MR, AttributedTo, Entities) :-
 		 *               C		*
 		 *******************************/
 
-chapter_json(chapter(Start,End,Title,Entities),
-	     json([start=Start,
-		   end=End,
+chapter_list(_, [], []).
+chapter_list(N, [C|Cs], [JSON|Rest]) :-
+	N1 is N+1,
+	chapter_json(N, C, JSON),
+	chapter_list(N1, Cs, Rest).
+
+chapter_json(N, chapter(Start,End,Title,Entities),
+	     json([id=N,
+		   startTime=StartTime,
+		   duration=Duration,
 		   title=Title,
-		   entities=JSON_Entities
+		   fragments=JSON_Entities
 		  ])) :-
-	     maplist(entity_json, Entities, JSON_Entities).
+	StartTime is Start*1000,
+	Duration is (Start+End)*1000,
+	maplist(entity_json, Entities, JSON_Entities).
 
 entity_json(entity(Start,End,Label,URI),
-	  json([ start=Start,
-	    end=End,
-	    label=Label,
-	    wikiURL=URI
-	  ])).
+	  json([startTime=StartTime,
+		duration=Duration,
+		title=Label,
+		locator=URI
+	  ])) :-
+	StartTime is Start*1000,
+	Duration is (Start+End)*1000.
 
 chapter_entities([], _, []).
 chapter_entities([chapter(Start,End,Label)|Cs], Entities, [chapter(Start,End,Label,Chapter_Entities)|CsE]) :-
@@ -302,7 +313,7 @@ entities_in_chapter([E|Es], Start, End, [E|Es_C], Rest) :-
 	!,
 	entities_in_chapter(Es, Start, End, Es_C, Rest).
 entities_in_chapter([E|Es], Start, End, Es_C, Rest) :-
-	E = entity(E_Start,E_End,_,_),
+	E = entity(E_Start,_E_End,_,_),
 	E_Start	< End,
 	!,
 	entities_in_chapter(Es, Start, End, Es_C, Rest).
@@ -321,7 +332,7 @@ disambiguation(Item, URI) :-
 	xpath_chk(Item, //hasBody//locator(text), URI),
 	!.
 disambiguation(Item, URI) :-
-	xpath_chk(Item, //hasBody//sameAs(@href), URI),
+	xpath_chk(Item, //hasBody//sameAs(text), URI),
 	!.
 disambiguation(_Item, '').
 
