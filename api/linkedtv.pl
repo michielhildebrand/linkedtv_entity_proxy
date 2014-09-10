@@ -186,16 +186,7 @@ http_episode(Request) :-
 			  curated(Curated,
 				  [boolean,default(true),
 				   description('When true only get curated data')
-				  ]),
-			  resolve(Resolve,
-				  [boolean,default(false),
-				   description('Crawl URLs of annotations')
-				  ]),
-			  lang(Lang, [default(en)])
-			]),
-	episode_data(MR0, Curated, Lang, Resolve).
-
-episode_data(MR0, Curated, Lang, Resolve) :-
+				  ])			]),
 	mediaresource_id_url(MR0, MR),
 	%EntityType = 'http://data.linkedtv.eu/ontologies/core#Entity',
 	(   Curated
@@ -204,7 +195,7 @@ episode_data(MR0, Curated, Lang, Resolve) :-
 	),
 	fetch_program(MR0, Title, Date, Publisher, Duration),
 	fetch_chapters(MR, AttributedTo, Chapters),
-	fetch_entities(MR, AttributedTo, Lang, Resolve, Entities),
+	fetch_entities(MR, AttributedTo, Entities),
 	chapter_entities(Chapters, Entities, ChapterData),
 	maplist(chapter_json, ChapterData, ChapterJSON),
 	reply_json(json([title= Title,
@@ -212,6 +203,7 @@ episode_data(MR0, Curated, Lang, Resolve) :-
 			 source=Publisher,
 			 duration=Duration,
 			 chapters=ChapterJSON])).
+
 
 fetch_program(MR, Title, Date, Publisher, Duration) :-
 	atomic_list_concat(['/mediaresource/', MR, '.xml'], Path),
@@ -259,7 +251,7 @@ chapter_in_xml(XML, Start, End, Label) :-
 	xpath_chk(Item, //hasBody//label(text), Label).
 
 
-fetch_entities(MR, AttributedTo, Lang, Resolve, Entities) :-
+fetch_entities(MR, AttributedTo, Entities) :-
 	http_open([ host('data.linkedtv.eu'),
 		    path('/API/annotation'),
 		    search(['hasTarget.isFragmentOf'=MR,
@@ -274,8 +266,8 @@ fetch_entities(MR, AttributedTo, Lang, Resolve, Entities) :-
 		  []),
 	load_xml(In, XML, []),
 	close(In),
-	Entity = entity(Start,End,Label,URI,Image,Thumb,Desc),
-	findall(Entity, entity_in_xml(XML,Lang,Resolve,Start,End,Label,URI,Image,Thumb,Desc), Entities0),
+	Entity = entity(Start,End,Label,URI),
+	findall(Entity, entity_in_xml(XML,Start,End,Label,URI), Entities0),
 	sort(Entities0, Entities).
 
 
@@ -291,13 +283,10 @@ chapter_json(chapter(Start,End,Title,Entities),
 		  ])) :-
 	     maplist(entity_json, Entities, JSON_Entities).
 
-entity_json(entity(Start,End,Label,URI,Image,Thumb,Desc),
+entity_json(entity(Start,End,Label,URI),
 	  json([ start=Start,
 	    end=End,
 	    label=Label,
-	    image=Image,
-	    thumb=Thumb,
-	    desc=Desc,
 	    wikiURL=URI
 	  ])).
 
@@ -307,36 +296,34 @@ chapter_entities([chapter(Start,End,Label)|Cs], Entities, [chapter(Start,End,Lab
 	chapter_entities(Cs, Rest, CsE).
 
 entities_in_chapter([E|Es], Start, End, [E|Es_C], Rest) :-
-	E = entity(E_Start,E_End,_,_,_,_,_),
-	E_Start >= Start,
-	E_End < End,
+	E = entity(E_Start,E_End,_,_),
+	E_Start >= Start-20,
+	E_End =< End,
 	!,
 	entities_in_chapter(Es, Start, End, Es_C, Rest).
 entities_in_chapter([E|Es], Start, End, Es_C, Rest) :-
-	E = entity(E_Start,_,_,_,_,_,_),
-	E_Start < Start,
+	E = entity(E_Start,E_End,_,_),
+	E_Start	< End,
 	!,
 	entities_in_chapter(Es, Start, End, Es_C, Rest).
 entities_in_chapter(Entities, _, _, [], Entities).
 
 
-
-
-
-
-entity_in_xml(XML, Lang, Resolve, Start, End, Label, URI, Image, Thumb, Desc) :-
+entity_in_xml(XML, Start, End, Label, URI) :-
 	xpath(XML, //items/item, Item),
 	xpath_chk(Item, //hasBody//type/item(@href), 'http://data.linkedtv.eu/ontologies/core#Entity'),
 	xpath_chk(Item, //hasTarget//temporalStart(number), Start),
 	xpath_chk(Item, //hasTarget//temporalEnd(number), End),
 	xpath_chk(Item, //hasBody//label(text), Label),
-	(   Resolve,
-	    xpath_chk(Item, //hasBody//locator(text), URI)
-	->  entity_data(URI, Lang, Image, Thumb, Desc)
-	;   Resolve,
-	    xpath_chk(Item, //hasBody//sameAs(@href), URI)
-	->  entity_data(URI, Lang, Image, Thumb, Desc)
-	).
+	disambiguation(Item, URI).
+
+disambiguation(Item, URI) :-
+	xpath_chk(Item, //hasBody//locator(text), URI),
+	!.
+disambiguation(Item, URI) :-
+	xpath_chk(Item, //hasBody//sameAs(@href), URI),
+	!.
+disambiguation(_Item, '').
 
 entity_data(URI, Lang, Image, Thumb, Desc) :-
 	crawl_entity(URI, []),
