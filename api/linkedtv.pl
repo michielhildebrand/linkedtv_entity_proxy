@@ -21,8 +21,9 @@
 :- debug(entity_cache).
 
 :- http_handler(cliopatria(entity_cache), http_entity_cache, []).
-:- http_handler(cliopatria(news/entities), http_news_entities, []).
-:- http_handler(cliopatria(exp/entities/test), http_exp_entities_test, []).
+:- http_handler(cliopatria(episode), http_episode, []).
+% :- http_handler(cliopatria(exp/entities/test), http_exp_entities_test,
+% []).
 
 http_entity_cache(Request) :-
 	http_parameters(Request,
@@ -174,10 +175,10 @@ entity_type(E, Type) :-
 
 
 		 /*******************************
-		 *	   LINKEDTV News	*
+		 *	   MediaResource	*
 		 *******************************/
 
-http_news_entities(Request) :-
+http_episode(Request) :-
 	http_parameters(Request,
 			[ mediaresource(MR0,
 			      [description('Id or URI of mediaresource')
@@ -186,8 +187,15 @@ http_news_entities(Request) :-
 				  [boolean,default(true),
 				   description('When true only get curated data')
 				  ]),
+			  resolve(Resolve,
+				  [boolean,default(false),
+				   description('Crawl URLs of annotations')
+				  ]),
 			  lang(Lang, [default(en)])
 			]),
+	episode_data(MR0, Curated, Lang, Resolve).
+
+episode_data(MR0, Curated, Lang, Resolve) :-
 	mediaresource_id_url(MR0, MR),
 	%EntityType = 'http://data.linkedtv.eu/ontologies/core#Entity',
 	(   Curated
@@ -196,7 +204,7 @@ http_news_entities(Request) :-
 	),
 	fetch_program(MR0, Title, Date, Publisher, Duration),
 	fetch_chapters(MR, AttributedTo, Chapters),
-	fetch_entities(MR, AttributedTo, Lang, Entities),
+	fetch_entities(MR, AttributedTo, Lang, Resolve, Entities),
 	chapter_entities(Chapters, Entities, ChapterData),
 	maplist(chapter_json, ChapterData, ChapterJSON),
 	reply_json(json([title= Title,
@@ -251,12 +259,12 @@ chapter_in_xml(XML, Start, End, Label) :-
 	xpath_chk(Item, //hasBody//label(text), Label).
 
 
-fetch_entities(MR, AttributedTo, Lang, Entities) :-
+fetch_entities(MR, AttributedTo, Lang, Resolve, Entities) :-
 	http_open([ host('data.linkedtv.eu'),
 		    path('/API/annotation'),
 		    search(['hasTarget.isFragmentOf'=MR,
 			    'wasAttributedTo'=AttributedTo,
-			    'hasBody.type'='Entity',
+			    'hasBody.type'='http://data.linkedtv.eu/ontologies/core#Entity',
 			    '_view'='full',
 			    '_pageSize'=1000,
 			    '_format'=xml
@@ -267,7 +275,7 @@ fetch_entities(MR, AttributedTo, Lang, Entities) :-
 	load_xml(In, XML, []),
 	close(In),
 	Entity = entity(Start,End,Label,URI,Image,Thumb,Desc),
-	findall(Entity, entity_in_xml(XML,Lang,Start,End,Label,URI,Image,Thumb,Desc), Entities0),
+	findall(Entity, entity_in_xml(XML,Lang,Resolve,Start,End,Label,URI,Image,Thumb,Desc), Entities0),
 	sort(Entities0, Entities).
 
 
@@ -316,15 +324,17 @@ entities_in_chapter(Entities, _, _, [], Entities).
 
 
 
-entity_in_xml(XML, Lang, Start, End, Label, URI, Image, Thumb, Desc) :-
+entity_in_xml(XML, Lang, Resolve, Start, End, Label, URI, Image, Thumb, Desc) :-
 	xpath(XML, //items/item, Item),
 	xpath_chk(Item, //hasBody//type/item(@href), 'http://data.linkedtv.eu/ontologies/core#Entity'),
 	xpath_chk(Item, //hasTarget//temporalStart(number), Start),
 	xpath_chk(Item, //hasTarget//temporalEnd(number), End),
 	xpath_chk(Item, //hasBody//label(text), Label),
-	(   xpath_chk(Item, //hasBody//locator(text), URI)
+	(   Resolve,
+	    xpath_chk(Item, //hasBody//locator(text), URI)
 	->  entity_data(URI, Lang, Image, Thumb, Desc)
-	;   xpath_chk(Item, //hasBody//sameAs(@href), URI)
+	;   Resolve,
+	    xpath_chk(Item, //hasBody//sameAs(@href), URI)
 	->  entity_data(URI, Lang, Image, Thumb, Desc)
 	).
 
