@@ -75,7 +75,7 @@ entity_props(R, [type=Types|Data], Options) :-
 		       entity_type(Class, Type)
 		      ),
 		Types0),
-	sort(Types0, Types),
+	sort([resource|Types0], Types),
 	(   option(basic(true), Options)
 	->  basic_props(Props)
 	;   all_props(Types, Props)
