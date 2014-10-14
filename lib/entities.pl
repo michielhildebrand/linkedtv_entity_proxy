@@ -35,6 +35,12 @@ entity_type(C, organisation) :- rdf_equal(C, 'http://dbpedia.org/ontology/Compan
 entity_type(C, organisation) :- rdf_equal(C, 'http://dbpedia.org/ontology/Organisation').
 entity_type(C, organisation) :- rdf_equal(C, 'http://schema.org/Organization').
 
+entity_type(C, politicalparty) :- rdf_equal(C, 'http://dbpedia.org/ontology/PoliticalParty').
+
+entity_type(C, politician) :- rdf_equal(C, 'http://dbpedia.org/ontology/OfficeHolder').
+entity_type(C, politician) :- rdf_equal(C, 'http://umbel.org/umbel/rc/Politician').
+entity_type(C, politician) :- rdf_equal(C, 'http://dbpedia.org/class/yago/Officeholder110371450').
+entity_type(C, politician) :- rdf_equal(C, 'http://dbpedia.org/class/yago/Politician110451263').
 
 
 %%	entity_prop(+Type, -Name, -PropertyURIs, -RecursivlyResolve)
@@ -62,17 +68,35 @@ entity_prop(person, profession, ['http://dbpedia.org/ontology/occupation'], true
 entity_prop(person, predecessor, ['http://dbpedia.org/ontology/predecessor'], true).
 entity_prop(person, successor, ['http://dbpedia.org/ontology/successor'], true).
 
+%can we give alternative properties, there are often both English and Dutch/German, or only one or the other
+
+% from http://www.linkedtv.eu/wiki/index.php/Annotation_types_in_TKK
+
 entity_prop(artist, style, ['http://dbpedia.org/ontology/movement'], true).
 
 entity_prop(presenter, activeSince, ['http://dbpedia.org/ontology/activeYearsStartYear'], false).
 entity_prop(presenter, knownFor, ['http://dbpedia.org/ontology/knownFor'], true).
 entity_prop(presenter, presents, ['http://dbpedia.org/ontology/presenter'], true).
-%can we give alternative properties, there are often both English and Dutch, or only one or the other
 entity_prop(presenter, guestedIn, ['http://nl.dbpedia.org/property/vasteGasten'], true).
 
 entity_prop(museum, locatedIn, ['http://dbpedia.org/ontology/location'], true).
 
 entity_prop(place, population, ['http://dbpedia.org/ontology/populationTotal'], false).
+
+%more specific properties when the place is a building or other construction
+entity_prop(place, owner, ['http://de.dbpedia.org/property/eigentümer'], true).
+entity_prop(place, openingDate, ['http://de.dbpedia.org/property/eröffnung'], false).
+entity_prop(place, location, ['http://de.dbpedia.org/property/standort'], true).
+entity_prop(place, architect, ['http://de.dbpedia.org/property/architekt'], true).
+entity_prop(place, builtBy, ['http://de.dbpedia.org/property/bauherr'], true).
+entity_prop(place, builtYear, ['http://de.dbpedia.org/property/baujahr'], false).
+entity_prop(place, architecture, ['http://de.dbpedia.org/property/baustil'], false).
+
+%more specific properties when the place is an administrative region
+entity_prop(place, localLeader, ['http://dbpedia.org/ontology/leaderName'], true).
+entity_prop(place, localLeaderTitle, ['http://dbpedia.org/ontology/leaderTitle'], false).
+entity_prop(place, localLeaderParty, ['http://de.dbpedia.org/property/partei'], true).
+entity_prop(place, unemploymentRate, ['http://de.dbpedia.org/property/arbeitslosenquote'], false).
 
 %this is based on http://www.linkedtv.eu/wiki/index.php/Creating_rich_descriptions_of_cultural_artefacts_out_of_a_TV_program#Vocabulary
 entity_prop(artobject, createdIn, ['http://simile.mit.edu/2003/10/ontologies/vraCore3#locationCreationSite'], true).
@@ -80,7 +104,7 @@ entity_prop(artobject, createdBy, ['http://purl.org/dc/terms/creator'], true).
 entity_prop(artobject, currentlyFoundAt, ['http://www.cidoc-crm.org/rdfs/cidoc-crm#P55F.has_current_location'], true).
 entity_prop(artobject, hasStyle, ['http://simile.mit.edu/2003/10/ontologies/vraCore3#stylePeriod'], true).
 entity_prop(artobject, madeOf, ['http://www.cidoc-crm.org/rdfs/cidoc-crm#P45F.consists_of'], true).
-%time periods and price estimates need to query the value of a property of a value of a property!
+%time periods and price estimates need to access properties along a path, is that possible?
 
 
 % from http://www.linkedtv.eu/wiki/index.php/Annotation_types_in_RBB
@@ -90,3 +114,32 @@ entity_prop(film, musicComposer, ['http://dbpedia.org/ontology/musicComposer'], 
 entity_prop(film, starring, ['http://dbpedia.org/ontology/starring'], true).
 
 entity_prop(organisation, chairman, ['http://dbpedia.org/ontology/chairman'], true).
+entity_prop(organisation, focus, ['http://de.dbpedia.org/property/focus'], true).
+entity_prop(organisation, formationYear, ['http://dbpedia.org/ontology/formationYear'], false).
+entity_prop(organisation, founder, ['http://de.dbpedia.org/property/founder'], true).
+entity_prop(organisation, foundingYear, ['http://dbpedia.org/ontology/foundingYear'], false).
+%entity_prop(organisation, foundingYear, ['http://de.dbpedia.org/property/gr%C3%BCndungsdatum'], false).
+entity_prop(organisation, industry, ['http://dbpedia.org/ontology/industry'], true).
+entity_prop(organisation, location, ['http://dbpedia.org/ontology/location'], true).
+entity_prop(organisation, locationCity, ['http://dbpedia.org/ontology/locationCity'], true).
+entity_prop(organisation, numberEmployees, ['http://dbpedia.org/ontology/numberOfEmployees'], false).
+
+entity_prop(politicalparty, headquarter, ['http://dbpedia.org/ontology/headquarter'], false).
+entity_prop(politicalparty, deputyLeader, ['http://dbpedia.org/ontology/secondLeader'], false).
+entity_prop(politicalparty, politicalLeaning, ['http://de.dbpedia.org/property/ausrichtung'], false).
+%please check the effect of using special characters in properties
+entity_prop(politicalparty, leader, ['http://de.dbpedia.org/property/bundesgeschäftsführer'], false).
+entity_prop(politicalparty, euParlament, ['http://de.dbpedia.org/property/euParlament'], false).
+entity_prop(politicalparty, founding, ['http://de.dbpedia.org/property/gründung'], false).
+entity_prop(politicalparty, foundingLocation, ['http://de.dbpedia.org/property/gründungsort'], true).
+entity_prop(politicalparty, chairperson, ['http://de.dbpedia.org/property/parteivorsitzende'], true).
+
+entity_prop(politician, activeSince, ['http://dbpedia.org/ontology/activeYearsStartDate'], false).
+entity_prop(politician, activeUntil, ['http://dbpedia.org/ontology/activeYearsEndDate'], false).
+entity_prop(politician, office, ['http://dbpedia.org/ontology/office'], false).
+entity_prop(politician, party, ['http://dbpedia.org/ontology/party'], true).
+entity_prop(politician, officeholderBefore, ['http://dbpedia.org/property/before'], true).
+entity_prop(politician, officeholderAfter, ['http://dbpedia.org/property/after'], true).
+
+
+
