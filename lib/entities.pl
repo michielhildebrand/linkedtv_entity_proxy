@@ -117,8 +117,7 @@ entity_prop(organisation, chairman, ['http://dbpedia.org/ontology/chairman'], tr
 entity_prop(organisation, focus, ['http://de.dbpedia.org/property/focus'], true).
 entity_prop(organisation, formationYear, ['http://dbpedia.org/ontology/formationYear'], false).
 entity_prop(organisation, founder, ['http://de.dbpedia.org/property/founder'], true).
-entity_prop(organisation, foundingYear, ['http://dbpedia.org/ontology/foundingYear'], false).
-%entity_prop(organisation, foundingYear, ['http://de.dbpedia.org/property/gr%C3%BCndungsdatum'], false).
+entity_prop(organisation, foundingYear, ['http://dbpedia.org/ontology/foundingYear','http://de.dbpedia.org/property/gr%C3%BCndungsdatum'], false).
 entity_prop(organisation, industry, ['http://dbpedia.org/ontology/industry'], true).
 entity_prop(organisation, location, ['http://dbpedia.org/ontology/location'], true).
 entity_prop(organisation, locationCity, ['http://dbpedia.org/ontology/locationCity'], true).
