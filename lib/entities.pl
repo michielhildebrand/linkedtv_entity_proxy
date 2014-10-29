@@ -116,7 +116,7 @@ entity_prop(film, starring, ['http://dbpedia.org/ontology/starring'], true).
 entity_prop(organisation, chairman, ['http://dbpedia.org/ontology/chairman'], true).
 entity_prop(organisation, focus, ['http://de.dbpedia.org/property/focus'], true).
 entity_prop(organisation, formationYear, ['http://dbpedia.org/ontology/formationYear'], false).
-entity_prop(organisation, founder, ['http://dbpedia.org/property/foundedBy','http://de.dbpedia.org/property/founder'], true).
+entity_prop(organisation, founder, ['http://dbpedia.org/ontology/foundedBy','http://de.dbpedia.org/property/founder'], true).
 entity_prop(organisation, foundingYear, ['http://dbpedia.org/ontology/foundingYear','http://de.dbpedia.org/property/gr%C3%BCndungsdatum'], false).
 entity_prop(organisation, industry, ['http://dbpedia.org/ontology/industry'], true).
 entity_prop(organisation, location, ['http://dbpedia.org/ontology/location'], true).
