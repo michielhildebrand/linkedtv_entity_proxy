@@ -11,6 +11,7 @@
 :- use_module(library(http/http_ssl_plugin)).
 :- use_module(library(semweb/rdf_db)).
 :- use_module(library(semweb/rdf_label)).
+:- use_module(api(entity_proxy)).
 
 :- setting(sameas_load, boolean, true,
 	   'Load Same As URLs as well').
@@ -147,7 +148,7 @@ load_lod(URI, Force) :-
 load_lod_sameas(URI, Force, Langs) :-
 	setting(sameas_load, true),
 	findall(load_lod(Same, Force),
-		(   rdf(URI, owl:sameAs, Same),
+		(   same(URI, Same),
 		    \+ Same = URI,
 		    sameas_lang_filter(Same, Langs)
 		), Cmds0),

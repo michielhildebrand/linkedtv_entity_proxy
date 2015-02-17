@@ -1,6 +1,7 @@
 :- module(entity_proxy,
 	  [entity_props/3,
-	   entity_prop/4
+	   entity_prop/4,
+	   same/2
 	  ]).
 
 :- use_module(library(http/http_dispatch)).
@@ -38,6 +39,10 @@ http_entity_proxy(Request) :-
 				[description('When set to true only basic information is returned'),
 				 default(false)
 				]),
+			  force(Force,
+				[description('Force a new crawl'),
+				 default(false)
+				]),
 			  callback(CallbackFunction,
 				   [description('JSONP callback function'),
 				    optional(true)
@@ -49,7 +54,7 @@ http_entity_proxy(Request) :-
 	 ;   URL_List = []
 	 ),
 	 append(URLs0, URL_List, URLs),
-	 Options = [lang(Lang),basic(Basic)],
+	 Options = [lang(Lang),basic(Basic),force(Force)],
 	 entities_props(URLs, URL_Props, Options),
 	 (   nonvar(CallbackFunction)   % output jsonp
 	 ->  format('Content-type: application/javascript~n~n'),
@@ -70,7 +75,8 @@ entities_props([URL|URLs], [URL-json(Props)|URLs_Props], Options) :-
 
 entity_props(R, [type=Types|Data], Options) :-
 	option(lang(Lang), Options),
-	crawl_entity(R, []),
+	option(force(Force), Options, false),
+	crawl_entity(R, [force(Force)]),
 	findall(Type, (rdf_same(R, rdf:type, Class),
 		       entity_type(Class, Type)
 		      ),
