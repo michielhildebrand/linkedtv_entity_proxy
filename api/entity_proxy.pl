@@ -173,11 +173,12 @@ rdf_same(S,P,O) :-
 	rdf(S1,P,O).
 
 
-same(E,E).
 same(E1,E2) :-
 	findall(E,
-		(   rdf(E1,owl:sameAs,E)
+		(   E1 = E
+		;   rdf(E1,owl:sameAs,E)
 		;   rdf(E,owl:sameAs,E1)
+		;   rdf(E1,'http://dbpedia.org/ontology/wikiPageRedirects',E)
 		),
 		Es0),
 	sort(Es0, Es),
