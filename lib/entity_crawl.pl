@@ -158,7 +158,7 @@ load_lod_sameas(URI, Force, Langs) :-
 	concurrent(5, Cmds, []).
 
 sameas_lang_filter(URI, _Languages) :-
-	sub_atom(URI, 7, 7, _, dbpedia),
+	sub_atom(URI, 7, _, _, 'dbpedia.org'),
 	!.
 sameas_lang_filter(URI, Languages) :-
 	sub_atom(URI, 7, 2, _, Lang),
