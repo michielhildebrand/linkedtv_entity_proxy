@@ -174,10 +174,17 @@ literal_lang(lang(Lang0, _), Lang) :- !,
 literal_lang(_, '').
 
 
-rdf_same(S,P,O) :-
+rdf_same(S,P0,O) :-
 	same(S,S1),
+	rdf_property_map(P0,P),
 	rdf(S1,P,O).
 
+% hack to handle weird internal URL for DE.dbpedia.org
+rdf_property_map(P0,P) :-
+	sub_atom(P0, 0, Length, _, 'http://de.dbpedia.org/'),
+	sub_atom(P0, Length, _, 0, Path),
+	atomic_concat('http://dbpedia.imp.fu-berlin.de:49156/', Path, P).
+rdf_property_map(P,P).
 
 same(E1,E2) :-
 	findall(E,
