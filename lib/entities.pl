@@ -88,7 +88,7 @@ entity_prop(place, owner, ['http://de.dbpedia.org/property/eigentümer'], true).
 entity_prop(place, openingDate, ['http://de.dbpedia.org/property/eröffnung'], false).
 entity_prop(place, location, ['http://de.dbpedia.org/property/standort'], true).
 entity_prop(place, architect, ['http://de.dbpedia.org/property/architekt'], true).
-entity_prop(place, builtBy, ['http://de.dbpedia.org/property/bauherr'], true).
+entity_prop(place, builtBy, ['http://de.dbpedia.org/property/bauherr','http://de.dbpedia.org/property/baumeister'], true).
 entity_prop(place, builtYear, ['http://de.dbpedia.org/property/baujahr'], false).
 entity_prop(place, architecture, ['http://de.dbpedia.org/property/baustil'], false).
 
