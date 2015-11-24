@@ -11,6 +11,10 @@
 
 entity_type(_, resource).
 
+entity_type(C, work) :- rdf_equal(C, 'http://dbpedia.org/ontology/Work').
+
+entity_type(C, television) :- rdf_equal(C, 'http://dbpedia.org/ontology/TelevisionShow').
+
 entity_type(C, person) :- rdf_equal(C, 'http://dbpedia.org/ontology/Person').
 entity_type(C, person) :- rdf_equal(C, 'http://xmlns.com/foaf/0.1/Person').
 entity_type(C, person) :- rdf_equal(C, 'http://dbpedia.org/class/yago/Person100007846').
@@ -71,6 +75,15 @@ entity_prop(person, successor, ['http://dbpedia.org/ontology/successor'], true).
 %can we give alternative properties, there are often both English and Dutch/German, or only one or the other
 
 % from http://www.linkedtv.eu/wiki/index.php/Annotation_types_in_TKK
+
+entity_prop(television, creator, ['http://dbpedia.org/ontology/creator'], true).
+entity_prop(television, genre, ['http://dbpedia.org/ontology/genre'], false).
+entity_prop(television, network, ['http://dbpedia.org/ontology/network'], false).
+entity_prop(television, numberOfEpisodes, ['http://dbpedia.org/ontology/numberOfEpisodes'], false).
+entity_prop(television, numberOfSeasons, ['http://dbpedia.org/ontology/numberOfSeasons'], false).
+entity_prop(television, releaseDate, ['http://dbpedia.org/ontology/releaseDate'], false).
+entity_prop(television, starring, ['http://dbpedia.org/ontology/starring'], true).
+
 
 entity_prop(artist, style, ['http://dbpedia.org/ontology/movement'], true).
 
