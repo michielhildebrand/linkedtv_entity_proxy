@@ -95,11 +95,14 @@ entity_prop(presenter, guestedIn, ['http://nl.dbpedia.org/property/vasteGasten']
 entity_prop(museum, locatedIn, ['http://dbpedia.org/ontology/location'], true).
 
 entity_prop(place, population, ['http://dbpedia.org/ontology/populationTotal'], false).
+entity_prop(place, latitude, ['http://www.w3.org/2003/01/geo/wgs84_pos#lat'], false).
+entity_prop(place, longitude, ['http://www.w3.org/2003/01/geo/wgs84_pos#long'], false).
+entity_prop(place, region, ['http://dbpedia.org/property/subdivisionName'], true).
 
 %more specific properties when the place is a building or other construction
+entity_prop(place, location, ['http://dbpedia.org/property/location'], true).
 entity_prop(place, owner, ['http://de.dbpedia.org/property/eigentümer'], true).
 entity_prop(place, openingDate, ['http://de.dbpedia.org/property/eröffnung'], false).
-entity_prop(place, location, ['http://de.dbpedia.org/property/standort'], true).
 entity_prop(place, architect, ['http://de.dbpedia.org/property/architekt'], true).
 entity_prop(place, builtBy, ['http://de.dbpedia.org/property/bauherr','http://de.dbpedia.org/property/baumeister'], true).
 entity_prop(place, builtYear, ['http://de.dbpedia.org/property/baujahr'], false).
@@ -109,7 +112,6 @@ entity_prop(place, architecture, ['http://de.dbpedia.org/property/baustil'], fal
 entity_prop(place, localLeader, ['http://dbpedia.org/ontology/leaderName'], true).
 entity_prop(place, localLeaderTitle, ['http://dbpedia.org/ontology/leaderTitle'], false).
 entity_prop(place, localLeaderParty, ['http://de.dbpedia.org/property/partei'], true).
-entity_prop(place, unemploymentRate, ['http://de.dbpedia.org/property/arbeitslosenquote'], false).
 
 %this is based on http://www.linkedtv.eu/wiki/index.php/Creating_rich_descriptions_of_cultural_artefacts_out_of_a_TV_program#Vocabulary
 entity_prop(artobject, createdIn, ['http://simile.mit.edu/2003/10/ontologies/vraCore3#locationCreationSite'], true).
