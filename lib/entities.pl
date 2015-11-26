@@ -75,8 +75,8 @@ entity_prop(person, profession, ['http://dbpedia.org/ontology/occupation'], true
 
 entity_prop(character, creator, ['http://dbpedia.org/ontology/creator'], true).
 entity_prop(character, portrayedby, ['http://dbpedia.org/ontology/portrayer'], true).
-entity_prop(character, in-series, ['http://dbpedia.org/ontology/series'], true).
-entity_prop(character, in-book, ['http://dbpedia.org/property/book(s)_'], true).
+entity_prop(character, inSeries, ['http://dbpedia.org/ontology/series'], true).
+entity_prop(character, inBook, ['http://dbpedia.org/property/book(s)_'], true).
 
 % LN extension for people who held a role in their lifetimes (doesn't
 % seem to be always indicated by a specific type)
